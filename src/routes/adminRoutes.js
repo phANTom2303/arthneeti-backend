@@ -1,4 +1,5 @@
-const express = require('express');
+import express from 'express';
+
 const router = express.Router();
 
 // This endpoint will be accessible at: http://localhost:5000/api/admin/health
@@ -10,4 +11,4 @@ router.get('/health', (req, res) => {
 // router.get('/sessions', verifyAdmin, adminSessionController.getAllSessions);
 // router.delete('/sessions/:userId', verifyAdmin, adminSessionController.revokeUserSessions);
 
-module.exports = router;
+export default router;
