@@ -17,8 +17,8 @@ app.use(cors());
 app.use(express.json()); // Parse incoming JSON payloads
 
 // Mount the routes with explicit base paths
-app.use('/api/client', clientRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/client', clientRoutes);
+app.use('/admin', adminRoutes);
 
 // Global Error Handler (Good practice for a security platform)
 app.use((err, req, res, next) => {
