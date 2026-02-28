@@ -1,10 +1,9 @@
 import express from 'express';
-
+import { RESPONSE_CODES } from '#src/lib/common';
 const router = express.Router();
 
-// This endpoint will be accessible at: http://localhost:5000/api/admin/health
 router.get('/health', (req, res) => {
-    res.status(200).json({ status: 'Admin API is operational' });
+    res.status(RESPONSE_CODES.SUCCESS_CODE).json({ status: 'Admin API is operational' });
 });
 
 // Future routes will look like:
