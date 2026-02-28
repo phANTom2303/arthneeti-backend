@@ -2,6 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet'; // Standard security headers
+import { logger } from './config/logger.js';
+import { RESPONSE_CODES } from './lib/common.js';
 
 // Import separated route files
 import clientRoutes from './routes/clientRoutes.js';
@@ -20,13 +22,13 @@ app.use('/api/admin', adminRoutes);
 
 // Global Error Handler (Good practice for a security platform)
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Internal Server Error' });
+    logger.error(err.stack);
+    res.status(RESPONSE_CODES.INTERNAL_SERVER_ERROR_CODE).json({ error: 'Internal Server Error' });
 });
 
 const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    logger.info(`Server is running on port ${PORT}`);
     // You will initialize your Mongo and Redis connections here later
 });
