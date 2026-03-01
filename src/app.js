@@ -17,7 +17,7 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json()); // Parse incoming JSON payloads
 
-connectMongoDB();
+await connectMongoDB();
 
 // Mount the routes with explicit base paths
 app.use('/client', clientRoutes);
