@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet'; // Standard security headers
 import { logger } from './config/logger.js';
 import { RESPONSE_CODES } from './lib/common.js';
+import  connectMongoDB  from '#config/db.js';
 
 // Import separated route files
 import clientRoutes from './routes/clientRoutes.js';
@@ -15,6 +16,8 @@ const app = express();
 app.use(helmet());
 app.use(cors());
 app.use(express.json()); // Parse incoming JSON payloads
+
+connectMongoDB();
 
 // Mount the routes with explicit base paths
 app.use('/client', clientRoutes);
