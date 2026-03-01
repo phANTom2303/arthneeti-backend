@@ -5,6 +5,7 @@ import helmet from 'helmet'; // Standard security headers
 import { logger } from './config/logger.js';
 import { RESPONSE_CODES } from './lib/common.js';
 import  connectMongoDB  from '#config/db.js';
+import { initRedis } from '#config/redis.js';
 
 // Import separated route files
 import clientRoutes from './routes/clientRoutes.js';
@@ -18,6 +19,7 @@ app.use(cors());
 app.use(express.json()); // Parse incoming JSON payloads
 
 await connectMongoDB();
+await initRedis();
 
 // Mount the routes with explicit base paths
 app.use('/client', clientRoutes);
