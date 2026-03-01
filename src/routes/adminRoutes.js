@@ -1,5 +1,5 @@
 import express from 'express';
-import { RESPONSE_CODES } from '#src/lib/common';
+import { RESPONSE_CODES } from '#src/lib/common.js';
 const router = express.Router();
 
 router.get('/health', (req, res) => {
