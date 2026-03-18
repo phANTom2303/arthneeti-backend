@@ -1,3 +1,3 @@
-# Securitron (Backend)
+# ArthNeeti (Backend)
 
-A security library platform which streamlines the flows of integrating security through various authentication flows, managing sessions, tracking malicious activities and giving live insights through a dashboard.
+A Stock Charting platform empowering users with Agentic AI Analysis based Buy/Sell/Hold recommendations. 
