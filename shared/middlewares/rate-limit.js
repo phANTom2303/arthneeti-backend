@@ -1,5 +1,5 @@
 import rateLimit from "express-rate-limit";
-import { RateLimitError } from "#src/lib/errors.js";
+import { RateLimitError } from "../lib/errors.js";
 
 export const rateLimitHandler = ({ windowInMinutes = 1, limit = 2 }) => {
     const windowMs = Number(windowInMinutes) * 60 * 1000;
