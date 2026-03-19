@@ -2,14 +2,10 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet'; // Standard security headers
-import { logger } from './config/logger.js';
-import { RESPONSE_CODES } from './lib/common.js';
-import  connectMongoDB  from '#config/db.js';
+import { logger } from '#config/logger.js';
+import { RESPONSE_CODES } from '#lib/common.js';
 import { initRedis } from '#config/redis.js';
 
-// Import separated route files
-import clientRoutes from './routes/clientRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
 
 const app = express();
 
@@ -18,12 +14,10 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json()); // Parse incoming JSON payloads
 
-await connectMongoDB();
 await initRedis();
-
-// Mount the routes with explicit base paths
-app.use('/client', clientRoutes);
-app.use('/admin', adminRoutes);
+app.get("/api", (req, res) => {
+    return res.json("Hello from artheneti rest api server");
+});
 
 // Global Error Handler (Good practice for a security platform)
 app.use((err, req, res, next) => {
@@ -34,6 +28,6 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
-    logger.info(`Server is running on port ${PORT}`);
+    logger.info(`REst Api server is running on port ${PORT}`);
     // You will initialize your Mongo and Redis connections here later
 });
