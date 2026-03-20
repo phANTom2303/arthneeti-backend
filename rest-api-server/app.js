@@ -6,6 +6,7 @@ import { logger } from '#config/logger.js';
 import { RESPONSE_CODES } from '#lib/common.js';
 import { initRedis } from '#config/redis.js';
 import aiVerdictRouter from '#api/routes/ai-verdict.js'
+import { AppError } from '#lib/errors.js';
 
 const app = express();
 
@@ -24,11 +25,23 @@ app.get("/api", (req, res) => {
 });
 
 
-
 // Global Error Handler (Good practice for a security platform)
 app.use((err, req, res, next) => {
-    logger.error(err.stack);
-    res.status(RESPONSE_CODES.INTERNAL_SERVER_ERROR_CODE).json({ error: 'Internal Server Error' });
+    if (err instanceof AppError && err.isOperational) {
+        logger.warn(`Operational Error [${err.status}]: ${err.message}`);
+
+        return res.status(err.status).json({
+            success: false,
+            error: err.message
+        });
+    }
+
+    logger.error(`Unanticipated ERROR: ${err.message}\nStack: ${err.stack}`);
+
+    return res.status(RESPONSE_CODES.INTERNAL_SERVER_ERROR_CODE).json({
+        success: false,
+        error: "An unexpected internal server error occurred."
+    });
 });
 
 const PORT = process.env.PORT || 5001;

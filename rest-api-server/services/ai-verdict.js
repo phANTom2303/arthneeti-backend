@@ -1,6 +1,8 @@
 import pool from "#config/db.js";
 import { getRedisClient } from "#config/redis.js";
 import { CacheKeys, CACHE_TTL } from "#utils/cache-keys.js";
+import { logger } from "#config/logger.js";
+import { NotFoundError } from "#lib/errors.js";
 class AI_Verdict {
     /**
      * Retrieves the most recent AI trading verdict for a given company symbol.
@@ -33,10 +35,13 @@ class AI_Verdict {
 
         const result = await pool.query(query, [company_symbol]);
 
-        if (result) {
+        if (result.rowCount > 0) {
             await redisClient.set(companySymbolCacheKey, JSON.stringify(result.rows[0]), { EX: CACHE_TTL.ONE_DAY });
+            return result.rows[0];
+        } else {
+            throw new NotFoundError("No Verdict exists for requested Symbol")
         }
-        return result.rows[0];
+
     }
 
     /**
@@ -66,9 +71,13 @@ class AI_Verdict {
         `;
 
         const result = await pool.query(query, [analysis_id]);
+        if (result.rowCount > 0) {
+            await redisClient.set(analysiIdCacheKey, JSON.stringify(result.rows), { EX: CACHE_TTL.ONE_DAY });
+            return result.rows;
+        } else {
+            throw new NotFoundError("No Reports found for the requested analysis ID");
+        }
 
-        await redisClient.set(analysiIdCacheKey, JSON.stringify(result.rows), { EX: CACHE_TTL.ONE_DAY });
-        return result.rows;
     }
 }
 
