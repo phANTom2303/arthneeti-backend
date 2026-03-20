@@ -6,6 +6,7 @@ import { logger } from '#config/logger.js';
 import { RESPONSE_CODES } from '#lib/common.js';
 import { initRedis } from '#config/redis.js';
 import aiVerdictRouter from '#api/routes/ai-verdict.js'
+import companiesRouter from '#api/routes/companies.js'
 import { AppError } from '#lib/errors.js';
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(express.json()); // Parse incoming JSON payloads
 await initRedis();
 
 app.use("/api/ai-verdict", aiVerdictRouter);
+app.use("/api/companies", companiesRouter);
 
 
 app.get("/api", (req, res) => {

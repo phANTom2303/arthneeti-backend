@@ -16,12 +16,12 @@
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "pm2 start ecosystem.config.cjs --watch --env development && nginx -c $(pwd)/nginx.conf",
-        "start": "pm2 start ecosystem.config.cjs --env production && nginx -c $(pwd)/nginx.conf",
+        "dev": "pm2 start ecosystem.config.cjs --watch --env development",
+        "start": "pm2 start ecosystem.config.cjs --env production",
         "logs": "pm2 logs",
         "logs-rest-api": "pm2 logs rest-api-server",
         "logs-live-tick": "pm2 logs live-tick-server",
-        "stop": "pm2 stop ecosystem.config.cjs && nginx -c $(pwd)/nginx.conf -s stop"
+        "stop": "pm2 stop ecosystem.config.cjs"
     },
     "repository": {
         "type": "git",
