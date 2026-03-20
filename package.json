@@ -7,7 +7,8 @@
         "#src/*": "./src/*",
         "#config/*": "./shared/config/*",
         "#lib/*": "./shared/lib/*",
-        "#middlewares/*": "./shared/middlewares/*"
+        "#middlewares/*": "./shared/middlewares/*",
+        "#utils/*":"./shared/utils/*"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",

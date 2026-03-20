@@ -1,4 +1,4 @@
-const { Pool } = require('pg');
+import { Pool } from "pg";
 
 // TimescaleDB Connection Configuration
 // TimescaleDB is built on PostgreSQL, so we use the pg library
@@ -9,4 +9,4 @@ const pool = new Pool({
   },
 });
 
-module.exports = pool;
+export default pool;
