@@ -10,5 +10,13 @@ export const CacheKeys = {
         latest_decision: (symbol) => `verdict:latest:decision${symbol.toUpperCase()}`,
 
         latest_reports: (analysisId) => `verdict:latest:reports:${analysisId}`
+    },
+
+    UPSTOX: {
+        instrument_key: (symbol) => `instrument:key:${symbol.toUpperCase()}`
+    },
+
+    COMPANIES: {
+        all: 'companies:all_list' 
     }
 };
