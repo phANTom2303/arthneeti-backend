@@ -7,6 +7,7 @@ import { RESPONSE_CODES } from '#lib/common.js';
 import { initRedis } from '#config/redis.js';
 import aiVerdictRouter from '#api/routes/ai-verdict.js'
 import companiesRouter from '#api/routes/companies.js'
+import historicalDataRouter from '#api/routes/historical-data.js';
 import { AppError } from '#lib/errors.js';
 
 const app = express();
@@ -20,6 +21,7 @@ await initRedis();
 
 app.use("/api/ai-verdict", aiVerdictRouter);
 app.use("/api/companies", companiesRouter);
+app.use('/api/historical-data', historicalDataRouter);
 
 
 app.get("/api", (req, res) => {
