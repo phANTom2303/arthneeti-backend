@@ -1,72 +1,47 @@
-import pool from "#config/db.js";
-import { getRedisClient } from "#config/redis.js";
 import axios from 'axios';
-import { NotFoundError } from "#lib/errors.js";
-import { CacheKeys, CACHE_TTL } from "#utils/cache-keys.js";
+import Companies from "#api/services/companies.js";
+
 
 const UPSTOX_BASE_URL = process.env.UPSTOX_BASE_URL;
 
 class HistoricalData {
     
-    static async fetchHistoricalData({ symbol, startDate, endDate, interval = 'day' }) {
-        const symbolUpper = symbol.toUpperCase();
-        const redisClient = getRedisClient();
-        const cacheKey = CacheKeys.UPSTOX.instrument_key(symbolUpper);
-        let instrumentKey;
+    static async fetchHistoricalData({ symbol, startDate, endDate }) {
 
-        // 1. Check Redis 
-        const cachedKey = await redisClient.get(cacheKey);
+        const instrumentKey = await Companies.getInstrumentKey(symbol);
+        
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        
+        // Calculate difference in days
+        const diffInMs = Math.abs(end - start);//difference in millisecs
+        const diffInDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24)); 
 
-        if (cachedKey) {
-            instrumentKey = cachedKey;
-        } else {
-            
-            const companyResult = await pool.query(
-                `SELECT instrument_key FROM companies WHERE symbol = $1`,
-                [symbolUpper]
-            );
-
-            if (companyResult.rows.length === 0) {
-                throw new NotFoundError(`Company symbol ${symbolUpper} not found in database.`);
-            }
-
-            instrumentKey = companyResult.rows[0].instrument_key;
-
-            // Update Redis so next request is faster
-            await redisClient.setEx(cacheKey, CACHE_TTL.ONE_DAY, instrumentKey);
-        }
-
-        // 3. Dynamic Interval Mapping for Upstox V3
-        // This ensures "3M" or "1D" buttons work by mapping frontend strings to Upstox units
         let apiUnit = 'days';
         let apiInterval = '1';
 
-        switch (interval.toLowerCase()) {
-            case '1minute':
-            case '1m':
-                apiUnit = 'minutes';
-                apiInterval = '1';
-                break;
-            case '30minute':
-            case '30m':
-                apiUnit = 'minutes';
-                apiInterval = '30';
-                break;
-            case 'day':
-            case '1d':
-            default:
-                apiUnit = 'days';
-                apiInterval = '1';
+        if (diffInDays <= 2) {
+            apiUnit = 'minutes';
+            apiInterval = '1';  // Intraday view
+        } else if (diffInDays > 2 && diffInDays <= 31) {
+            apiUnit = 'minutes';
+            apiInterval = '30'; // Monthly view
+        } else if (diffInDays > 31 && diffInDays <= 365) {
+            apiUnit = 'days';
+            apiInterval = '1';  // Yearly view
+        } else if (diffInDays > 365 && diffInDays <= 1095) {
+            apiUnit = 'weeks';
+            apiInterval = '1';  // 3-Year view
+        } else {
+            apiUnit = 'months';
+            apiInterval = '1'; // 3+ Year view
         }
 
-        // 4. Construct the precise V3 URL
+        // 3. Construct URL and Fetch
         const url = `${UPSTOX_BASE_URL}/${instrumentKey}/${apiUnit}/${apiInterval}/${endDate}/${startDate}`;
 
-        // 5. Fetch data from Upstox
         const response = await axios.get(url, {
-            headers: { 
-                'Accept': 'application/json'
-            }
+            headers: { 'Accept': 'application/json' }
         });
 
         return response.data;

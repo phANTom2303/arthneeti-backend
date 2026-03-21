@@ -34,6 +34,31 @@ class Companies {
 
         return result.rows;
     }
+
+    static async getInstrumentKey(symbol) {
+        const symbolUpper = symbol.toUpperCase();
+        const redisClient = getRedisClient();
+        const cacheKey = CacheKeys.UPSTOX.instrument_key(symbolUpper);
+
+        // 1. Try Cache
+        const cachedKey = await redisClient.get(cacheKey);
+        if (cachedKey) return cachedKey;
+
+        // 2. Try Database
+        const query = `SELECT instrument_key FROM companies WHERE symbol = $1`;
+        const result = await pool.query(query, [symbolUpper]);
+
+        if (result.rows.length === 0) {
+            throw new NotFoundError(`Company symbol ${symbolUpper} not found in database.`);
+        }
+
+        const instrumentKey = result.rows[0].instrument_key;
+
+        // 3. Save to Redis for next time
+        await redisClient.setEx(cacheKey, CACHE_TTL.ONE_DAY, instrumentKey);
+
+        return instrumentKey;
+    }
 }
 
 export default Companies;
