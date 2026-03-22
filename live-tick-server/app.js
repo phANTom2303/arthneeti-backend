@@ -5,10 +5,29 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import helmet from 'helmet';
 import axios from 'axios';
+
 import { logger } from '#config/logger.js';
 import { RESPONSE_CODES } from '#lib/common.js';
 import { AppError } from '#lib/errors.js';
 import pool from '#config/db.js'; // Adapted to match your alias import style
+
+// Flag to enable/disable trading hours enforcement
+const ENFORCE_TRADING_HOURS = true; // Set to false to disable restriction
+
+// Helper to check if current time is within Indian stock market trading hours
+function isWithinTradingHours() {
+    // Get current time in IST (UTC+5:30)
+    const now = new Date();
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const ist = new Date(utc + (5.5 * 60 * 60 * 1000));
+    const hours = ist.getHours();
+    const minutes = ist.getMinutes();
+    // Trading hours: 9:15am to 3:30pm IST
+    const startMinutes = 9 * 60 + 15; // 9:15am
+    const endMinutes = 15 * 60 + 30; // 3:30pm
+    const nowMinutes = hours * 60 + minutes;
+    return nowMinutes >= startMinutes && nowMinutes <= endMinutes;
+}
 
 const app = express();
 
@@ -74,6 +93,14 @@ async function fetchLastPrice(instrumentKey) {
 // Incoming websocket connections
 io.on('connection', (socket) => {
     logger.info(`New frontend client connected: ${socket.id}`);
+
+    // Trading hours enforcement
+    if (ENFORCE_TRADING_HOURS && !isWithinTradingHours()) {
+        logger.warn(`Connection rejected for ${socket.id}: Outside trading hours.`);
+        socket.emit('error_message', 'Connection rejected: Outside Indian stock market trading hours (9:15am-3:30pm IST).');
+        socket.disconnect(true);
+        return;
+    }
 
     let dummyDataInterval;
 
