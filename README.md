@@ -2,6 +2,10 @@
 
 > A Stock Charting platform empowering users with Agentic AI Analysis based Buy/Sell/Hold recommendations.
 
+## System Design Diagram : 
+
+![arthneet-system-design-digram.png](Arthneeti-System-design-Diagram.png)
+
 ---
 
 ## Prerequisites
