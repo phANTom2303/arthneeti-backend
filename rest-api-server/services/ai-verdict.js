@@ -21,6 +21,7 @@ class AI_Verdict {
         const cachedData = await redisClient.get(companySymbolCacheKey);
 
         if (cachedData) {
+            logger.info(`Returning Cached Verdict for${company_symbol}`);
             return JSON.parse(cachedData);
         }
 
@@ -37,6 +38,7 @@ class AI_Verdict {
 
         if (result.rowCount > 0) {
             await redisClient.set(companySymbolCacheKey, JSON.stringify(result.rows[0]), { EX: CACHE_TTL.ONE_DAY });
+             logger.info(`Returning DB Verdict for${company_symbol}`);
             return result.rows[0];
         } else {
             throw new NotFoundError("No Verdict exists for requested Symbol")

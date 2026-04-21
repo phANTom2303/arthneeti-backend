@@ -9,6 +9,7 @@ import aiVerdictRouter from '#api/routes/ai-verdict.js'
 import companiesRouter from '#api/routes/companies.js'
 import historicalDataRouter from '#api/routes/historical-data.js';
 import { AppError } from '#lib/errors.js';
+import { setupDbListeners } from '#api/services/dbListener.js';
 
 const app = express();
 
@@ -22,7 +23,7 @@ app.use(cors({
 app.use(express.json()); // Parse incoming JSON payloads
 
 await initRedis();
-
+await setupDbListeners();
 app.use("/api/ai-verdict", aiVerdictRouter);
 app.use("/api/companies", companiesRouter);
 app.use('/api/historical-data', historicalDataRouter);
